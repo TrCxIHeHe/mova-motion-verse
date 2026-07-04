@@ -2,11 +2,14 @@ import { motion, useScroll, useTransform, useInView, useMotionValue, animate } f
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { HeroScene } from "@/components/mova/HeroScene";
-import { TechOrbitScene, TECH_MODULES } from "@/components/mova/TechOrbitScene";
+import { TechOrbitScene, MOVA_BENEFITS } from "@/components/mova/TechOrbitScene";
 import { Cursor } from "@/components/mova/Cursor";
 import { SmoothScroll } from "@/components/mova/SmoothScroll";
 import { Nav } from "@/components/mova/Nav";
 import { MagneticButton } from "@/components/mova/MagneticButton";
+import { RouteEstimator } from "@/components/mova/RouteEstimator";
+import { ScrollProgress } from "@/components/mova/ScrollProgress";
+import { IntroOverlay } from "@/components/mova/IntroOverlay";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -58,6 +61,32 @@ function Counter({ to, suffix = "", decimals = 0 }: { to: number; suffix?: strin
     return () => controls.stop();
   }, [inView, to, mv, suffix, decimals]);
   return <span ref={ref}>0{suffix}</span>;
+}
+
+/* ---------- reveal wrapper for consistent, silky scroll-ins ---------- */
+
+function Reveal({
+  children,
+  delay = 0,
+  y = 28,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  y?: number;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-12%" }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
 /* ---------- HERO ---------- */
@@ -113,8 +142,8 @@ function Hero() {
             Intelligent dock-based urban mobility, engineered from silicon to sidewalk.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <MagneticButton variant="primary" href="#platform">Explore Platform</MagneticButton>
-            <MagneticButton variant="ghost" href="#join">Join the Movement</MagneticButton>
+            <MagneticButton variant="primary" href="#plan">Plan a Ride</MagneticButton>
+            <MagneticButton variant="ghost" href="#platform">Explore Platform</MagneticButton>
           </div>
         </motion.div>
 
@@ -144,12 +173,12 @@ function FutureCity() {
           The future of <span className="text-gradient">shared mobility</span>, wired into the city itself.
         </h2>
         <p className="mt-5 max-w-xl text-muted-foreground">
-          Every dock is a node. Every ride is data. MOVA weaves an intelligent lattice across the city so mobility becomes as ambient as the streetlights above it.
+          Every dock is a node. Every ride is effortless. MOVA weaves an intelligent lattice across the city so getting around becomes as ambient as the streetlights above it.
         </p>
 
-        <div className="mt-20 relative aspect-[16/10] rounded-3xl overflow-hidden glass-strong">
+        <Reveal delay={0.15} className="mt-20 relative aspect-[16/10] rounded-3xl overflow-hidden glass-strong">
           <CityHologram />
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -237,12 +266,12 @@ function CityHologram() {
 /* ---------- SECTION 2: Smart Docking ---------- */
 
 const DOCK_FEATURES = [
-  { id: "qr", label: "QR Unlock", desc: "Sub-second cryptographic ride authorization." , x: 22, y: 30 },
-  { id: "iot", label: "IoT Controller", desc: "Edge-compute node handling telemetry & safety.", x: 78, y: 22 },
-  { id: "gps", label: "GPS", desc: "Centimeter-grade positioning per dock cell.", x: 82, y: 55 },
-  { id: "charge", label: "Smart Charging", desc: "Adaptive current per battery health state.", x: 18, y: 62 },
-  { id: "battery", label: "Battery Monitoring", desc: "Per-cell voltage, thermal, and cycle tracking.", x: 30, y: 82 },
-  { id: "lock", label: "Automatic Lock", desc: "Magnetic dock lock verified end-to-end.", x: 74, y: 82 },
+  { id: "qr", label: "QR Unlock", desc: "Sub-second unlock, no app fumbling required.", x: 22, y: 30 },
+  { id: "iot", label: "Smart Controller", desc: "Every dock watches its own health and safety.", x: 78, y: 22 },
+  { id: "gps", label: "Precise Location", desc: "Find the nearest ride down to the meter.", x: 82, y: 55 },
+  { id: "charge", label: "Smart Charging", desc: "Batteries charge exactly as fast as they should.", x: 18, y: 62 },
+  { id: "battery", label: "Battery Monitoring", desc: "You'll never grab a scooter that won't make it.", x: 30, y: 82 },
+  { id: "lock", label: "Automatic Lock", desc: "Verified, magnetic, end-to-end secure.", x: 74, y: 82 },
   { id: "led", label: "LED Guidance", desc: "Ambient light choreography guides riders in.", x: 50, y: 12 },
 ];
 
@@ -264,7 +293,7 @@ function SmartDock() {
             </h2>
           </div>
           <p className="text-muted-foreground max-w-sm">
-            Seven subsystems, engineered in unison. Scroll to inspect the anatomy of a MOVA dock.
+            Seven systems, working in unison, so the only thing you have to think about is where you're going.
           </p>
         </div>
 
@@ -464,20 +493,43 @@ function RideMap() {
   );
 }
 
-/* ---------- SECTION 4: Technology Stack ---------- */
+/* ---------- SECTION 3.5: Plan a ride (interactive estimator) ---------- */
 
-function TechStack() {
+function PlanRide() {
   return (
-    <section id="tech" className="relative py-32 md:py-48 px-6 md:px-12 overflow-hidden">
+    <section id="plan" className="relative py-32 md:py-40 px-6 md:px-12 overflow-hidden">
+      <GridBackdrop />
+      <div className="relative max-w-5xl mx-auto">
+        <SectionEyebrow index="04" title="Plan your ride" />
+        <h2 className="mt-4 font-display font-medium text-[clamp(2rem,5vw,4.5rem)] leading-[1] max-w-3xl">
+          Pick two docks. <span className="text-gradient">See the ride before you take it.</span>
+        </h2>
+        <p className="mt-5 max-w-xl text-muted-foreground">
+          Choose where you're starting and where you're headed — MOVA estimates your time, distance, and fare instantly.
+        </p>
+
+        <Reveal delay={0.15} className="mt-14">
+          <RouteEstimator />
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- SECTION 4: Why MOVA ---------- */
+
+function WhyMova() {
+  return (
+    <section id="why" className="relative py-32 md:py-48 px-6 md:px-12 overflow-hidden">
       <GridBackdrop />
       <div className="relative max-w-6xl mx-auto">
-        <SectionEyebrow index="04" title="Technology core" />
+        <SectionEyebrow index="05" title="Why MOVA" />
         <div className="mt-4 grid md:grid-cols-2 gap-8 items-end">
           <h2 className="font-display font-medium text-[clamp(2rem,5vw,4.5rem)] leading-[1]">
-            A stack that <span className="text-gradient">orbits itself.</span>
+            Everything you need, <span className="text-gradient">nothing you don't.</span>
           </h2>
           <p className="text-muted-foreground max-w-md">
-            No cards. No lists. Twelve services, three orbits — one intelligent core routing every ride, every dock, every packet.
+            No confusing menus. No guesswork. Just a ride that unlocks in a second, knows where it's going, and takes care of the rest.
           </p>
         </div>
 
@@ -485,7 +537,7 @@ function TechStack() {
           <TechOrbitScene />
           {/* labels along orbits */}
           <div className="pointer-events-none absolute inset-0 flex flex-wrap gap-x-6 gap-y-2 p-6 items-end justify-center content-end">
-            {TECH_MODULES.map((m, i) => (
+            {MOVA_BENEFITS.map((m, i) => (
               <motion.span
                 key={m}
                 initial={{ opacity: 0, y: 10 }}
@@ -508,7 +560,7 @@ function TechStack() {
 
 const STEPS = [
   { n: "01", t: "Find Dock", d: "MOVA locates the nearest available dock in your radius." },
-  { n: "02", t: "Scan QR", d: "Cryptographic handshake in under 400 milliseconds." },
+  { n: "02", t: "Scan QR", d: "One scan and you're in — under half a second." },
   { n: "03", t: "Unlock", d: "Magnetic dock releases. Scooter powers up." },
   { n: "04", t: "Ride", d: "Adaptive routing keeps you in the safest, fastest lane." },
   { n: "05", t: "Park", d: "Auto-detected safe parking zones inside the geo-net." },
@@ -525,7 +577,7 @@ function HowItWorks() {
     <section id="how" ref={ref} className="relative py-32 md:py-48 px-6 md:px-12 overflow-hidden">
       <GridBackdrop />
       <div className="relative max-w-4xl mx-auto">
-        <SectionEyebrow index="05" title="How MOVA works" />
+        <SectionEyebrow index="06" title="How MOVA works" />
         <h2 className="mt-4 font-display font-medium text-[clamp(2rem,5vw,4.5rem)] leading-[1]">
           Seven steps. <span className="text-gradient">Zero friction.</span>
         </h2>
@@ -608,7 +660,7 @@ function Sustainability() {
         </div>
 
         <div>
-          <SectionEyebrow index="06" title="Sustainability" />
+          <SectionEyebrow index="07" title="Sustainability" />
           <h2 className="mt-4 font-display font-medium text-[clamp(2rem,5vw,4.5rem)] leading-[1]">
             A greener city, <span className="text-gradient">measured by the ride.</span>
           </h2>
@@ -641,9 +693,9 @@ function FleetIntelligence() {
     <section id="fleet" className="relative py-32 md:py-48 px-6 md:px-12 overflow-hidden">
       <GridBackdrop />
       <div className="relative max-w-6xl mx-auto">
-        <SectionEyebrow index="07" title="Fleet intelligence" />
+        <SectionEyebrow index="08" title="Always watching" />
         <h2 className="mt-4 font-display font-medium text-[clamp(2rem,5vw,4.5rem)] leading-[1] max-w-3xl">
-          A control room for the <span className="text-gradient">living fleet.</span>
+          A city that knows <span className="text-gradient">where every ride is.</span>
         </h2>
 
         <div className="mt-16 grid md:grid-cols-3 gap-4">
@@ -778,6 +830,8 @@ function FinalScene() {
 function Landing() {
   return (
     <main className="relative bg-obsidian text-foreground">
+      <IntroOverlay />
+      <ScrollProgress />
       <SmoothScroll />
       <Cursor />
       <Nav />
@@ -785,7 +839,8 @@ function Landing() {
       <FutureCity />
       <SmartDock />
       <RideExperience />
-      <TechStack />
+      <PlanRide />
+      <WhyMova />
       <HowItWorks />
       <Sustainability />
       <FleetIntelligence />

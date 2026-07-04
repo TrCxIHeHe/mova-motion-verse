@@ -3,10 +3,10 @@ import { Float, Sphere } from "@react-three/drei";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
-const MODULES = [
-  "Backend", "Mobile App", "Cloud", "IoT",
-  "GPS", "MQTT", "PostgreSQL", "Docker",
-  "Flutter", "FastAPI", "Redis", "WebSockets",
+const BENEFITS = [
+  "Instant Unlock", "Live Battery", "Smart Routing", "Safe Parking",
+  "Auto Payments", "Carbon Tracking", "24/7 Support", "Fleet Health",
+  "Geo-Fencing", "Predictive Care", "Night Ride LEDs", "Weather Adapt",
 ];
 
 function Core() {
@@ -49,7 +49,7 @@ function Orbit({ radius, speed, tilt, children }: { radius: number; speed: numbe
   );
 }
 
-function ModuleNode({ label, angle, radius }: { label: string; angle: number; radius: number }) {
+function BenefitNode({ angle, radius }: { label: string; angle: number; radius: number }) {
   const x = Math.cos(angle) * radius;
   const z = Math.sin(angle) * radius;
   return (
@@ -86,9 +86,9 @@ function OrbitRing({ radius }: { radius: number }) {
 
 export function TechOrbitScene() {
   const groups = [
-    { radius: 2.2, speed: 0.25, tilt: 0.4, items: MODULES.slice(0, 4) },
-    { radius: 3.2, speed: -0.18, tilt: -0.3, items: MODULES.slice(4, 8) },
-    { radius: 4.2, speed: 0.14, tilt: 0.1, items: MODULES.slice(8, 12) },
+    { radius: 2.2, speed: 0.25, tilt: 0.4, items: BENEFITS.slice(0, 4) },
+    { radius: 3.2, speed: -0.18, tilt: -0.3, items: BENEFITS.slice(4, 8) },
+    { radius: 4.2, speed: 0.14, tilt: 0.1, items: BENEFITS.slice(8, 12) },
   ];
   return (
     <Canvas
@@ -108,7 +108,7 @@ export function TechOrbitScene() {
           <OrbitRing radius={g.radius} />
           <Orbit radius={g.radius} speed={g.speed} tilt={0}>
             {g.items.map((label, i) => (
-              <ModuleNode key={label} label={label} angle={(i / g.items.length) * Math.PI * 2} radius={g.radius} />
+              <BenefitNode key={label} label={label} angle={(i / g.items.length) * Math.PI * 2} radius={g.radius} />
             ))}
           </Orbit>
         </group>
@@ -117,4 +117,4 @@ export function TechOrbitScene() {
   );
 }
 
-export const TECH_MODULES = MODULES;
+export const MOVA_BENEFITS = BENEFITS;
