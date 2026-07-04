@@ -76,7 +76,10 @@ function Hero() {
       </div>
 
       {/* vignette */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,#050505_90%)]" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: "radial-gradient(ellipse at center, transparent 40%, #050505 90%)" }}
+      />
 
       {/* scanline */}
       <div className="pointer-events-none absolute inset-x-0 h-24 opacity-30 animate-scan bg-gradient-to-b from-transparent via-cyan/20 to-transparent" />
