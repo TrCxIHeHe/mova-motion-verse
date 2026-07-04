@@ -275,7 +275,7 @@ export function HeroScene() {
       </Float>
       <DockHardware reveal={phase} />
       <CameraRig />
-      <Environment preset="night" />
+      
     </Canvas>
   );
 }
