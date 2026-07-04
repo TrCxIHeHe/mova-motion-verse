@@ -68,7 +68,7 @@ function dockPositions(count: number): Float32Array {
 
 function ParticleField({ phase }: { phase: number }) {
   // phase 0..1 -> logo -> dock
-  const COUNT = 6500;
+  const COUNT = 3500;
   const meshRef = useRef<THREE.Points>(null);
   const [ready, setReady] = useState(false);
   const targetsA = useRef<Float32Array>(new Float32Array(COUNT * 3));
