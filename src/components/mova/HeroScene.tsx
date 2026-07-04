@@ -147,10 +147,10 @@ function ParticleField({ phase }: { phase: number }) {
   return (
     <points ref={meshRef} geometry={geom}>
       <pointsMaterial
-        size={0.035}
+        size={0.03}
         vertexColors
         transparent
-        opacity={0.9}
+        opacity={0.7}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
         sizeAttenuation
